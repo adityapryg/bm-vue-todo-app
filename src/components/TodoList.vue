@@ -1,17 +1,19 @@
 <template>
   <div class="max-w-[600px] my-8 mx-auto px-4">
-    <ul class="bg-white/80 backdrop-blur-[10px] rounded-2xl p-6 shadow-[0_8px_32px_rgba(0,0,0,0.1)]">
+    <ul
+      class="bg-white/80 backdrop-blur-[10px] rounded-2xl p-6 shadow-[0_8px_32px_rgba(0,0,0,0.1)]"
+    >
       <li v-for="(item, index) in sortedList" :key="item.title + index">
-        <ListItem :isChecked="item.checked" @update="updateItem(item)">
+        <Task :isChecked="item.checked" @update="updateItem(item)">
           {{ item.title }}
-        </ListItem>
+        </Task>
       </li>
     </ul>
   </div>
 </template>
 
 <script lang="ts" setup>
-import ListItem from './ListItem.vue'
+import Task from './Task.vue'
 import { ref, computed, onMounted } from 'vue'
 import type { Ref } from 'vue'
 
