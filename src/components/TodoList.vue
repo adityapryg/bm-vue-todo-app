@@ -14,8 +14,7 @@
 
 <script lang="ts" setup>
 import TaskItem from './TaskItem.vue'
-import { ref, computed, onMounted } from 'vue'
-import type { Ref } from 'vue'
+import { ref, computed, onMounted, type Ref } from 'vue'
 
 type Item = {
   title: string
@@ -73,7 +72,7 @@ const toggleItemChecked = (item: Item): void => {
 const addNewTodo = (title: string): void => {
   const newItem: Item = {
     title,
-    checked: false
+    checked: false,
   }
   storageItems.value.unshift(newItem)
   setToStorage(storageItems.value)
@@ -89,6 +88,6 @@ onMounted(() => {
 })
 
 defineExpose({
-  addNewTodo
+  addNewTodo,
 })
 </script>
