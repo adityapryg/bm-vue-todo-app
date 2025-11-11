@@ -2,18 +2,24 @@
   <div class="todo-container">
     <ul class="todo-list">
       <li v-for="(item, index) in sortedList" :key="item.title + index">
-        <ListItem :isChecked="item.checked" @update="updateItem(item)">
+        <ListItem :isChecked="item.checked" @update="updateItem(item)" @delete="startDelete(item)">
           {{ item.title }}
         </ListItem>
       </li>
     </ul>
+    <TodoDeleteModal
+      :isOpen="isDeleteModalOpen"
+      :todoTitle="deletingItem?.title || ''"
+      @confirm="confirmDelete"
+      @cancel="cancelDelete"
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
 import ListItem from './ListItem.vue'
-import { ref, computed, onMounted } from 'vue'
-import { Ref } from 'vue'
+import TodoDeleteModal from './TodoDeleteModal.vue'
+import { ref, computed, onMounted, type Ref } from 'vue'
 
 type Item = {
   title: string
@@ -21,6 +27,8 @@ type Item = {
 }
 
 const storageItems: Ref<Item[]> = ref([])
+const isDeleteModalOpen = ref(false)
+const deletingItem = ref<Item | null>(null)
 
 const setToStorage = (items: Item[]): void => {
   localStorage.setItem('list-items', JSON.stringify(items))
@@ -80,6 +88,30 @@ const addNewTodo = (title: string): void => {
 const sortedList = computed(() =>
   [...storageItems.value].sort((a, b) => (a.checked ? 1 : 0) - (b.checked ? 1 : 0)),
 )
+
+const startDelete = (item: Item): void => {
+  deletingItem.value = item
+  isDeleteModalOpen.value = true
+}
+
+const confirmDelete = (): void => {
+  if (deletingItem.value) {
+    const index = storageItems.value.findIndex(
+      (item) => item.title === deletingItem.value!.title,
+    )
+    if (index !== -1) {
+      storageItems.value.splice(index, 1)
+      setToStorage(storageItems.value)
+    }
+  }
+  isDeleteModalOpen.value = false
+  deletingItem.value = null
+}
+
+const cancelDelete = (): void => {
+  isDeleteModalOpen.value = false
+  deletingItem.value = null
+}
 
 onMounted(() => {
   storageItems.value = getFromStorage()

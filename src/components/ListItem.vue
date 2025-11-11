@@ -6,6 +6,14 @@
     <span class="todo-text">
       <slot></slot>
     </span>
+    <button
+      class="delete-btn"
+      @click.prevent="emit('delete')"
+      title="Delete todo"
+      aria-label="Delete todo"
+    >
+      🗑️
+    </button>
   </label>
 </template>
 
@@ -14,7 +22,7 @@ defineProps<{
   isChecked?: boolean | false
 }>()
 
-const emit = defineEmits(['update'])
+const emit = defineEmits(['update', 'delete'])
 </script>
 
 <style scoped>
@@ -100,5 +108,40 @@ label:hover .checkbox-custom {
 .checked .todo-text {
   text-decoration: line-through;
   color: #a0aec0;
+}
+
+.delete-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  opacity: 0;
+}
+
+label:hover .delete-btn {
+  opacity: 1;
+}
+
+.delete-btn:hover {
+  background: #fee2e2;
+  transform: scale(1.1);
+}
+
+.delete-btn:active {
+  transform: scale(0.95);
+}
+
+@media (max-width: 768px) {
+  .delete-btn {
+    opacity: 1;
+  }
 }
 </style>
