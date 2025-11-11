@@ -1,19 +1,5 @@
 <template>
-  <header class="app-header">
-    <h1>✨ Todo List</h1>
+  <header class="py-8 px-4 mb-8">
+    <h1 class="text-4xl text-white font-bold shadow-[2px_2px_4px_rgba(0,0,0,0.1)] mb-2">✨ Todo List</h1>
   </header>
 </template>
-<style scoped>
-.app-header {
-  padding: 2rem 1rem;
-  margin-bottom: 2rem;
-}
-
-h1 {
-  font-size: 2.5rem;
-  color: white;
-  font-weight: 700;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 0.5rem;
-}
-</style>
