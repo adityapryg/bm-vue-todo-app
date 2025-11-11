@@ -12,8 +12,7 @@
 
 <script lang="ts" setup>
 import ListItem from './ListItem.vue'
-import { ref } from 'vue'
-import type { Ref } from 'vue'
+import { ref, Ref, computed } from 'vue'
 type Item = {
   title: string
   checked?: boolean
@@ -32,7 +31,9 @@ const listItems: Ref<Item[]> = ref([
 
 const updateItem = (item: Item): void => {
   const updatedItem = findItemInList(item)
-  toggleItemChecked(updatedItem)
+  if (updatedItem) {
+    toggleItemChecked(updatedItem)
+  }
 }
 const findItemInList = (item: Item): Item | undefined => {
   return listItems.value.find((itemInList: Item) => itemInList.title === item.title)
@@ -40,6 +41,10 @@ const findItemInList = (item: Item): Item | undefined => {
 const toggleItemChecked = (item: Item): void => {
   item.checked = !item.checked
 }
+
+const sortedList = computed(() =>
+  [...listItems.value].sort((a, b) => (a.checked ? 1 : 0) - (b.checked ? 1 : 0)),
+)
 </script>
 
 <style scoped>
