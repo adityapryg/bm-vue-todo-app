@@ -50,6 +50,8 @@ export function useAuth() {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password: _, ...userWithoutPassword } = user
       currentUser.value = userWithoutPassword
+      // Note: Storing user data in localStorage is for demo purposes only
+      // In production, use secure httpOnly cookies with server-side sessions
       localStorage.setItem('auth-user', JSON.stringify(userWithoutPassword))
       return { success: true }
     }
@@ -85,6 +87,8 @@ export function useAuth() {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password: _, ...userWithoutPassword } = newUser
     currentUser.value = userWithoutPassword
+    // Note: Storing user data in localStorage is for demo purposes only
+    // In production, use secure httpOnly cookies with server-side sessions
     localStorage.setItem('auth-user', JSON.stringify(userWithoutPassword))
 
     return { success: true }
