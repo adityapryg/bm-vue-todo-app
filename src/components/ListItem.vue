@@ -1,9 +1,3 @@
-<script lang="ts" setup>
-defineProps<{
-  isChecked?: boolean | false
-}>()
-</script>
-
 <template>
   <label :class="{ checked: isChecked }">
     <input type="checkbox" :checked="isChecked" />
@@ -14,6 +8,12 @@ defineProps<{
     </span>
   </label>
 </template>
+
+<script lang="ts" setup>
+defineProps<{
+  isChecked?: boolean | false
+}>()
+</script>
 
 <style scoped>
 label {
