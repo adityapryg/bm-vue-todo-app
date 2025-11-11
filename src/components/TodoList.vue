@@ -68,6 +68,15 @@ const toggleItemChecked = (item: Item): void => {
   item.checked = !item.checked
 }
 
+const addNewTodo = (title: string): void => {
+  const newItem: Item = {
+    title,
+    checked: false
+  }
+  storageItems.value.unshift(newItem)
+  setToStorage(storageItems.value)
+}
+
 const sortedList = computed(() =>
   [...storageItems.value].sort((a, b) => (a.checked ? 1 : 0) - (b.checked ? 1 : 0)),
 )
@@ -75,6 +84,10 @@ const sortedList = computed(() =>
 onMounted(() => {
   storageItems.value = getFromStorage()
   initListItems()
+})
+
+defineExpose({
+  addNewTodo
 })
 </script>
 
