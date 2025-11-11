@@ -6,6 +6,9 @@
     <span class="todo-text">
       <slot></slot>
     </span>
+    <button v-if="!isChecked" class="edit-button" @click.prevent="emit('edit')" type="button">
+      ✏️
+    </button>
   </label>
 </template>
 
@@ -14,7 +17,7 @@ defineProps<{
   isChecked?: boolean | false
 }>()
 
-const emit = defineEmits(['update'])
+const emit = defineEmits(['update', 'edit'])
 </script>
 
 <style scoped>
@@ -100,5 +103,40 @@ label:hover .checkbox-custom {
 .checked .todo-text {
   text-decoration: line-through;
   color: #a0aec0;
+}
+
+.edit-button {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+  opacity: 0;
+}
+
+label:hover .edit-button {
+  opacity: 1;
+}
+
+.edit-button:hover {
+  background: rgba(102, 126, 234, 0.1);
+  transform: scale(1.1);
+}
+
+.edit-button:active {
+  transform: scale(0.95);
+}
+
+@media (max-width: 768px) {
+  .edit-button {
+    opacity: 1;
+  }
 }
 </style>
