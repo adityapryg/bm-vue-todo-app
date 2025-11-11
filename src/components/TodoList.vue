@@ -4,16 +4,16 @@
       class="bg-white/80 backdrop-blur-[10px] rounded-2xl p-6 shadow-[0_8px_32px_rgba(0,0,0,0.1)]"
     >
       <li v-for="(item, index) in sortedList" :key="item.title + index">
-        <Task :isChecked="item.checked" @update="updateItem(item)">
+        <TaskItem :isChecked="item.checked" @update="updateItem(item)">
           {{ item.title }}
-        </Task>
+        </TaskItem>
       </li>
     </ul>
   </div>
 </template>
 
 <script lang="ts" setup>
-import Task from './Task.vue'
+import TaskItem from './TaskItem.vue'
 import { ref, computed, onMounted } from 'vue'
 import type { Ref } from 'vue'
 
