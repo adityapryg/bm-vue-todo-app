@@ -1,11 +1,20 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import AppHeader from './components/AppHeader.vue'
+import TodoForm from './components/TodoForm.vue'
 import TodoList from './components/TodoList.vue'
+
+const todoListRef = ref<InstanceType<typeof TodoList>>()
+
+const handleAddTodo = (title: string) => {
+  todoListRef.value?.addNewTodo(title)
+}
 </script>
 
 <template>
   <AppHeader />
-  <TodoList />
+  <TodoForm @addTodo="handleAddTodo" />
+  <TodoList ref="todoListRef" />
 </template>
 
 <style>
