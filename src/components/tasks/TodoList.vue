@@ -14,20 +14,24 @@
 import ListItem from './ListItem.vue'
 import { ref, computed, onMounted } from 'vue'
 import type { Ref } from 'vue'
+import type { Item } from '@/types'
 
-type Item = {
-  title: string
-  checked?: boolean
-}
+const props = defineProps<{
+  userId: string
+}>()
 
 const storageItems: Ref<Item[]> = ref([])
 
+const getStorageKey = (): string => {
+  return `list-items-${props.userId}`
+}
+
 const setToStorage = (items: Item[]): void => {
-  localStorage.setItem('list-items', JSON.stringify(items))
+  localStorage.setItem(getStorageKey(), JSON.stringify(items))
 }
 
 const getFromStorage = (): Item[] | [] => {
-  const stored = localStorage.getItem('list-items')
+  const stored = localStorage.getItem(getStorageKey())
   if (stored) {
     return JSON.parse(stored)
   }
