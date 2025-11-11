@@ -2,7 +2,12 @@
   <div class="todo-container">
     <ul class="todo-list">
       <li v-for="(item, index) in sortedList" :key="item.title + index">
-        <ListItem :isChecked="item.checked" @update="updateItem(item)">
+        <ListItem
+          :isChecked="item.checked"
+          :description="item.description"
+          :dueDate="item.dueDate"
+          @update="updateItem(item)"
+        >
           {{ item.title }}
         </ListItem>
       </li>
@@ -17,6 +22,8 @@ import type { Ref } from 'vue'
 
 type Item = {
   title: string
+  description?: string
+  dueDate?: string
   checked?: boolean
 }
 
@@ -71,6 +78,13 @@ const toggleItemChecked = (item: Item): void => {
 const sortedList = computed(() =>
   [...storageItems.value].sort((a, b) => (a.checked ? 1 : 0) - (b.checked ? 1 : 0)),
 )
+
+const addTodo = (newItem: Item): void => {
+  storageItems.value.unshift(newItem)
+  setToStorage(storageItems.value)
+}
+
+defineExpose({ addTodo })
 
 onMounted(() => {
   storageItems.value = getFromStorage()

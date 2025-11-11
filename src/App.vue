@@ -1,11 +1,28 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import AppHeader from './components/AppHeader.vue'
 import TodoList from './components/TodoList.vue'
+import TodoForm from './components/TodoForm.vue'
+import type { TodoFormData } from './components/TodoForm.vue'
+
+const todoListRef = ref<InstanceType<typeof TodoList> | null>(null)
+
+const handleCreateTodo = (data: TodoFormData): void => {
+  if (todoListRef.value) {
+    todoListRef.value.addTodo({
+      title: data.title,
+      description: data.description,
+      dueDate: data.dueDate,
+      checked: false,
+    })
+  }
+}
 </script>
 
 <template>
   <AppHeader />
-  <TodoList />
+  <TodoForm @create-todo="handleCreateTodo" />
+  <TodoList ref="todoListRef" />
 </template>
 
 <style>

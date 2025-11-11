@@ -3,18 +3,32 @@
     <input type="checkbox" :checked="isChecked" @change="emit('update')" />
     <!-- We can put any element to this slot -->
     <span class="checkbox-custom"></span>
-    <span class="todo-text">
-      <slot></slot>
-    </span>
+    <div class="todo-content">
+      <span class="todo-text">
+        <slot></slot>
+      </span>
+      <span v-if="description" class="todo-description">{{ description }}</span>
+      <span v-if="dueDate" class="todo-due-date">📅 {{ formattedDueDate }}</span>
+    </div>
   </label>
 </template>
 
 <script lang="ts" setup>
-defineProps<{
+import { computed } from 'vue'
+
+const props = defineProps<{
   isChecked?: boolean | false
+  description?: string
+  dueDate?: string
 }>()
 
 const emit = defineEmits(['update'])
+
+const formattedDueDate = computed(() => {
+  if (!props.dueDate) return ''
+  const date = new Date(props.dueDate)
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+})
 </script>
 
 <style scoped>
@@ -88,16 +102,47 @@ label:hover .checkbox-custom {
   font-weight: bold;
 }
 
-.todo-text {
+.todo-content {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
   text-align: left;
-  color: #2d3748;
-  font-size: 1rem;
-  transition: all 0.3s ease;
   margin-right: 1rem;
 }
 
+.todo-text {
+  color: #2d3748;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.todo-description {
+  color: #718096;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  margin-top: 0.25rem;
+}
+
+.todo-due-date {
+  color: #667eea;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-top: 0.25rem;
+}
+
 .checked .todo-text {
+  text-decoration: line-through;
+  color: #a0aec0;
+}
+
+.checked .todo-description {
+  text-decoration: line-through;
+  color: #cbd5e0;
+}
+
+.checked .todo-due-date {
   text-decoration: line-through;
   color: #a0aec0;
 }
