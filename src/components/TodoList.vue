@@ -12,8 +12,7 @@
 
 <script lang="ts" setup>
 import ListItem from './ListItem.vue'
-import { ref, computed, onMounted } from 'vue'
-import { Ref } from 'vue'
+import { ref, computed, onMounted, type Ref } from 'vue'
 
 type Item = {
   title: string
