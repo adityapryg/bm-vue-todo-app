@@ -2,7 +2,7 @@
   <div class="todo-container">
     <ul class="todo-list">
       <li v-for="(item, index) in sortedList" :key="item.title + index">
-        <ListItem :isChecked="item.checked">
+        <ListItem :isChecked="item.checked" @update="updateItem(item)">
           {{ item.title }}
         </ListItem>
       </li>

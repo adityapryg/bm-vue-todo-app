@@ -1,6 +1,6 @@
 <template>
   <label :class="{ checked: isChecked }">
-    <input type="checkbox" :checked="isChecked" />
+    <input type="checkbox" :checked="isChecked" @change="emit('update')" />
     <!-- We can put any element to this slot -->
     <span class="checkbox-custom"></span>
     <span class="todo-text">
@@ -13,6 +13,8 @@
 defineProps<{
   isChecked?: boolean | false
 }>()
+
+const emit = defineEmits(['update'])
 </script>
 
 <style scoped>
