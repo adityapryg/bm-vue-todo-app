@@ -1,17 +1,19 @@
 <template>
-  <div class="todo-container">
-    <ul class="todo-list">
+  <div class="max-w-[600px] my-8 mx-auto px-4">
+    <ul
+      class="bg-white/80 backdrop-blur-[10px] rounded-2xl p-6 shadow-[0_8px_32px_rgba(0,0,0,0.1)]"
+    >
       <li v-for="(item, index) in sortedList" :key="item.title + index">
-        <ListItem :isChecked="item.checked" @update="updateItem(item)">
+        <TaskItem :isChecked="item.checked" @update="updateItem(item)">
           {{ item.title }}
-        </ListItem>
+        </TaskItem>
       </li>
     </ul>
   </div>
 </template>
 
 <script lang="ts" setup>
-import ListItem from './ListItem.vue'
+import TaskItem from './TaskItem.vue'
 import { ref, computed, onMounted } from 'vue'
 import type { Ref } from 'vue'
 
@@ -77,19 +79,3 @@ onMounted(() => {
   initListItems()
 })
 </script>
-
-<style scoped>
-.todo-container {
-  max-width: 600px;
-  margin: 2rem auto;
-  padding: 0 1rem;
-}
-
-.todo-list {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
-</style>
