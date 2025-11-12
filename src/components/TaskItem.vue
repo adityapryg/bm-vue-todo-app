@@ -18,6 +18,9 @@
     >
       <slot></slot>
     </span>
+    <button v-if="!isChecked" class="edit-button" @click.prevent="emit('edit')" type="button">
+      ✏️
+    </button>
   </label>
 </template>
 
@@ -26,5 +29,5 @@ defineProps<{
   isChecked?: boolean | false
 }>()
 
-const emit = defineEmits(['update'])
+const emit = defineEmits(['update', 'edit'])
 </script>
