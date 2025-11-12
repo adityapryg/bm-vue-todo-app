@@ -1,8 +1,8 @@
 <template>
-  <div class="max-w-[600px] my-8 mx-auto px-4">
-    <ul
-      class="bg-white/80 backdrop-blur-[10px] rounded-2xl p-6 shadow-[0_8px_32px_rgba(0,0,0,0.1)]"
-    >
+  <div class="bg-white/80 backdrop-blur-[10px] rounded-2xl p-6 max-w-[600px] mx-auto px-4">
+    <TodoForm @addTodo="addNewTodo" />
+
+    <ul>
       <li v-for="(item, index) in sortedList" :key="item.title + index">
         <TaskItem :isChecked="item.checked" @update="updateItem(item)">
           {{ item.title }}
@@ -14,6 +14,7 @@
 
 <script lang="ts" setup>
 import TaskItem from './TaskItem.vue'
+import TodoForm from './TodoForm.vue'
 import { ref, computed, onMounted, type Ref } from 'vue'
 
 type Item = {
@@ -85,9 +86,5 @@ const sortedList = computed(() =>
 onMounted(() => {
   storageItems.value = getFromStorage()
   initListItems()
-})
-
-defineExpose({
-  addNewTodo,
 })
 </script>

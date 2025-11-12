@@ -1,15 +1,22 @@
 <template>
-  <div class="todo-form-container">
-    <form @submit.prevent="handleSubmit" class="todo-form">
+  <div>
+    <form
+      @submit.prevent="handleSubmit"
+      class="flex flex-col sm:flex-row gap-3 bg-white/90 backdrop-blur-[10px] rounded-2xl p-6 shadow-[0_8px_32px_rgba(0,0,0,0.1)]"
+    >
       <input
         v-model="newTodo"
         type="text"
         placeholder="Add a new todo..."
-        class="todo-input"
+        class="flex-1 py-3.5 px-5 border-2 border-[#e2e8f0] rounded-xl text-base bg-white text-[#2d3748] placeholder:text-[#a0aec0] focus:outline-none focus:border-[#667eea]"
         maxlength="100"
       />
-      <button type="submit" class="add-button" :disabled="!newTodo.trim()">
-        <span class="plus-icon">+</span>
+      <button
+        type="submit"
+        class="flex items-center justify-center sm:justify-start gap-2 py-3.5 px-6 bg-gradient-to-br from-[#667eea] to-[#764ba2] text-white border-none rounded-xl text-base font-semibold cursor-pointer whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+        :disabled="!newTodo.trim()"
+      >
+        <span class="text-xl font-bold leading-none">+</span>
         Add
       </button>
     </form>
@@ -21,7 +28,7 @@ import { ref } from 'vue'
 
 const newTodo = ref('')
 
-const emit = defineEmits<{  
+const emit = defineEmits<{
   (e: 'addTodo', title: string): void
 }>()
 
@@ -32,88 +39,3 @@ const handleSubmit = () => {
   }
 }
 </script>
-
-<style scoped>
-.todo-form-container {
-  max-width: 600px;
-  margin: 0 auto 1rem;
-  padding: 0 1rem;
-}
-
-.todo-form {
-  display: flex;
-  gap: 0.75rem;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
-
-.todo-input {
-  flex: 1;
-  padding: 0.875rem 1.25rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  background: white;
-  color: #2d3748;
-}
-
-.todo-input:focus {
-  outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.todo-input::placeholder {
-  color: #a0aec0;
-}
-
-.add-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.875rem 1.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  white-space: nowrap;
-}
-
-.add-button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-.add-button:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.add-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.plus-icon {
-  font-size: 1.25rem;
-  font-weight: bold;
-  line-height: 1;
-}
-
-@media (max-width: 640px) {
-  .todo-form {
-    flex-direction: column;
-  }
-
-  .add-button {
-    justify-content: center;
-  }
-}
-</style>
