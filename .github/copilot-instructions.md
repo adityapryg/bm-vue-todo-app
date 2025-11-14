@@ -1,98 +1,337 @@
-# Vue 3 Todo List - Copilot Instructions
+# Vue Todo App - Development Guide
 
-## Architecture
+## Architecture Overview
 
-Single-page Vue 3 app with component hierarchy: `App.vue` → `AppHeader.vue` + `TodoList.vue` → `ListItem.vue`. State management lives entirely in `TodoList.vue` using Composition API with localStorage persistence—no Vuex/Pinia.
+This is a Vue 3 + TypeScript single-page application (SPA) with client-side authentication and user-scoped todo lists.
 
-**Data Flow**: `ListItem` emits `'update'` → `TodoList.updateItem()` toggles `checked` → `setToStorage()` persists → `sortedList` computed re-renders with unchecked items first.
+### Tech Stack
 
-## Key Patterns
+- **Vue 3.5+** with Composition API (`<script setup>`)
+- **TypeScript** with strict type checking
+- **Vue Router 4** for navigation and route guards
+- **Vite** for build tooling
+- **LocalStorage** for data persistence (demo purposes)
 
-### State Management in TodoList.vue
+### Application Structure
 
-- `storageItems` ref is single source of truth, synced to `localStorage` key `'list-items'`
-- Every mutation calls `setToStorage(storageItems.value)` immediately after changes
-- `sortedList` computed property auto-sorts: unchecked items first via `(a.checked ? 1 : 0) - (b.checked ? 1 : 0)`
-- `initListItems()` seeds storage with default todos if empty (called once on mount)
-
-### Component Communication
-
-- Use `<script setup lang="ts">` with TypeScript generics for props/emits:
-  ```typescript
-  defineProps<{ isChecked?: boolean }>()
-  defineEmits<{ (e: 'update'): void }>()
-  ```
-- `ListItem.vue` uses default `<slot>` for flexible content injection
-- Child-to-parent updates via typed emits: `@change="emit('update')"` in checkbox → parent's `@update="updateItem(item)"`
-- Props use optional syntax (`isChecked?: boolean`) with default values in template logic
-
-### Type Definitions
-
-Define types inline within components (not separate `.d.ts` files):
-
-```typescript
-type Item = { title: string; checked?: boolean }
+```
+App.vue (router-view)
+├── LoginView → LoginForm (guest route)
+├── RegisterView → RegisterForm (guest route)
+├── DashboardView (protected route)
+└── TasksView (protected route)
+    └── AppHeader + TodoList → ListItem
 ```
 
-## Styling System
+## Directory Structure
 
-### Tailwind CSS v4 + Inline Styles
+```
+src/
+├── main.ts                 # App entry point with router setup
+├── App.vue                 # Root component with global styles
+├── router/
+│   └── index.ts           # Route configuration and navigation guards
+├── views/                  # Page-level components
+│   ├── LoginView.vue
+│   ├── RegisterView.vue
+│   ├── DashboardView.vue
+│   └── TasksView.vue
+├── components/
+│   ├── auth/              # Authentication components
+│   │   ├── LoginForm.vue
+│   │   └── RegisterForm.vue
+│   └── tasks/             # Todo management components
+│       ├── AppHeader.vue
+│       ├── TodoList.vue
+│       └── ListItem.vue
+├── composables/
+│   └── useAuth.ts         # Authentication logic (reactive state)
+└── types/
+    └── index.ts           # Shared TypeScript types
+```
 
-- **Setup**: Tailwind v4 imported via `@import "tailwindcss"` in `style.css` (not `@tailwind` directives)
-- **Pattern**: Long inline class strings with conditional classes via `:class` binding
-- **Example from ListItem.vue**:
-  ```vue
-  <span :class="isChecked ? 'line-through text-[#a0aec0]' : 'text-[#2d3748]'"></span>
-  ```
-- **No Scoped Styles**: Components use `<template>` with Tailwind classes only—no `<style scoped>` sections
-- **Global Styles**: Only in `App.vue` template and `style.css` `@layer base` for resets
+## Authentication System
 
-### Design Tokens
+### Composable Pattern
 
-- **Colors**: Purple gradient `#667eea` → `#764ba2`, white overlays with `bg-white/80`
-- **Glassmorphism**: `backdrop-blur-[10px]` + semi-transparent backgrounds
-- **Shadows**: `shadow-[0_8px_32px_rgba(0,0,0,0.1)]` for depth
-- **Animations**: `transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]` for smooth interactions
-- **Hover Effects**: `hover:-translate-y-0.5` + shadow increases, `before:` pseudo-elements for accent bars
+The app uses a **singleton composable** (`useAuth`) for authentication state:
+
+```typescript
+const currentUser = ref<User | null>(null) // Shared reactive state
+
+export function useAuth() {
+  const isAuthenticated = computed(() => currentUser.value !== null)
+
+  return {
+    currentUser,
+    isAuthenticated,
+    login(email, password) {
+      /* ... */
+    },
+    register(email, password, name) {
+      /* ... */
+    },
+    logout() {
+      /* ... */
+    },
+  }
+}
+```
+
+### LocalStorage Keys
+
+- `'users'` - Array of registered users with hashed passwords
+- `'auth-user'` - Current authenticated user (without password)
+- `'list-items-{userId}'` - User-scoped todo lists
+
+### Security Notes
+
+⚠️ **This is a demo implementation. DO NOT use in production!**
+
+- Passwords are hashed with a simple client-side hash (NOT secure)
+- User data stored in localStorage (NOT secure)
+- No server-side validation or authentication
+- No CSRF protection or rate limiting
+
+For production, use:
+
+- Proper backend authentication (JWT, OAuth)
+- Secure password hashing (bcrypt, argon2)
+- HttpOnly cookies for session tokens
+- Server-side validation and authorization
+
+## Router Configuration
+
+### Routes
+
+| Path         | Component     | Access        | Description                                                    |
+| ------------ | ------------- | ------------- | -------------------------------------------------------------- |
+| `/`          | Redirect      | Any           | Redirects to `/dashboard` if authenticated, `/login` otherwise |
+| `/login`     | LoginView     | Guest only    | User login form                                                |
+| `/register`  | RegisterView  | Guest only    | User registration form                                         |
+| `/dashboard` | DashboardView | Auth required | User stats and navigation                                      |
+| `/tasks`     | TasksView     | Auth required | Todo list management                                           |
+
+### Navigation Guards
+
+```typescript
+router.beforeEach((to, from, next) => {
+  const { isAuthenticated } = useAuth()
+
+  if (to.meta.requiresAuth && !isAuthenticated.value) {
+    next('/login') // Protect authenticated routes
+  } else if (to.meta.requiresGuest && isAuthenticated.value) {
+    next('/dashboard') // Redirect logged-in users from auth pages
+  } else {
+    next()
+  }
+})
+```
+
+## Component Patterns
+
+### Composition API with TypeScript
+
+All components use `<script setup lang="ts">` for type-safe composition:
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import type { User } from '@/types'
+
+// Props with TypeScript
+const props = defineProps<{
+  userId: string
+}>()
+
+// Emits with TypeScript
+const emit = defineEmits<{
+  (e: 'logout'): void
+}>()
+
+// Reactive state
+const user = ref<User | null>(null)
+</script>
+```
+
+### State Management
+
+- **Authentication**: Singleton composable with module-level reactive state
+- **Todo Lists**: LocalStorage with user-scoped keys
+- **No Vuex/Pinia**: Simple enough for Composition API only
+
+### Props and Events
+
+- Use `defineProps<{ ... }>()` for type-safe props
+- Use `defineEmits<{ ... }>()` for type-safe events
+- Use `@/` alias for imports from `src/`
+
+## Code Style
+
+### TypeScript
+
+- No semicolons
+- Single quotes for strings
+- 100 character line width
+- Inline type definitions (no separate interfaces unless reused)
+- Use TypeScript generics for route typing
+
+### Vue Components
+
+- `<script setup lang="ts">` for all components
+- Scoped styles in components
+- Global styles only in `App.vue`
+- Props and emits defined with TypeScript generics
+
+### Styling
+
+- **Purple gradient**: `linear-gradient(135deg, #667eea 0%, #764ba2 100%)`
+- **Glassmorphism**: `backdrop-filter: blur(10px)` with semi-transparent backgrounds
+- **Transitions**: `cubic-bezier(0.4, 0, 0.2, 1)` for smooth animations
+- **Font**: Poppins (via global styles)
+
+## Data Flow
+
+### Registration Flow
+
+1. User submits RegisterForm
+2. `useAuth().register()` validates and creates user
+3. User saved to `localStorage.getItem('users')`
+4. Auto-login: set `currentUser` and save to `localStorage.getItem('auth-user')`
+5. Router navigates to `/dashboard`
+
+### Login Flow
+
+1. User submits LoginForm
+2. `useAuth().login()` validates credentials
+3. On success: set `currentUser` and save to `localStorage.getItem('auth-user')`
+4. Router navigates to `/dashboard`
+
+### Todo Operations
+
+1. TodoList reads from `localStorage.getItem('list-items-{userId}')`
+2. User checks/unchecks todo → updates local state
+3. Changes saved to user-scoped localStorage key
+4. Todos sorted: unchecked first, checked last
+
+### Logout Flow
+
+1. User clicks logout button
+2. `useAuth().logout()` clears `currentUser`
+3. Remove `localStorage.getItem('auth-user')`
+4. Router navigates to `/login`
 
 ## Development Commands
 
 ```bash
-npm run dev          # Vite dev server with HMR on http://localhost:5173
-npm run build        # Type-check via vue-tsc THEN production build (both must pass)
-npm run type-check   # Run vue-tsc --build (required before merging)
-npm run lint         # ESLint with --fix and --cache enabled
-npm run format       # Prettier on src/ directory
-npm run deploy       # Build + gh-pages deploy to /bm-vue-todo-app/
+npm run dev          # Start dev server (http://localhost:5173)
+npm run build        # Build for production
+npm run preview      # Preview production build
+npm run type-check   # Run TypeScript compiler
+npm run lint         # Run ESLint with auto-fix
+npm run format       # Format code with Prettier
+npm run deploy       # Build and deploy to GitHub Pages
 ```
 
-**Pre-merge Checklist**: Run `npm run type-check` and `npm run lint` before committing.
+## Build Configuration
 
-## Configuration
+### Vite Config
 
-- **Path Alias**: `@/` → `src/` (configured in `vite.config.ts` and `tsconfig.app.json`)
-- **Prettier**: No semicolons, single quotes, 100 char line width (`.prettierrc.json`)
-- **ESLint**: Flat config (`eslint.config.ts`) with Vue 3 + TypeScript presets, ignores `dist/`, `coverage/`
-- **Vite Base Path**: `/bm-vue-todo-app/` for GitHub Pages deployment
-- **TypeScript**: Composite project with `tsconfig.json` referencing `tsconfig.app.json` + `tsconfig.node.json`
-- **Node.js**: Requires `^20.19.0 || >=22.12.0` (see `package.json` engines field)
-- **EditorConfig**: 2-space indents, LF line endings, 100 char max line length
+- Base path: `/bm-vue-todo-app/` (GitHub Pages deployment)
+- Path alias: `@/` → `src/`
+- Vue DevTools enabled in development
 
-## Common Tasks
+### TypeScript
 
-### Adding a New Todo Item
+- Strict mode enabled
+- Vue 3 types included
+- Node 22 types for build scripts
 
-Currently requires manual localStorage manipulation. To add programmatically:
+## Testing the App
 
-1. Get current items: `const items = JSON.parse(localStorage.getItem('list-items') || '[]')`
-2. Push new item: `items.push({ title: 'New todo', checked: false })`
-3. Save: `localStorage.setItem('list-items', JSON.stringify(items))`
-4. Reload page or trigger `storageItems.value = getFromStorage()` in TodoList
+### Manual Testing Checklist
 
-### Modifying Sort Order
+**Authentication Flow:**
 
-Edit `sortedList` computed in `TodoList.vue`. Current logic: `(a.checked ? 1 : 0) - (b.checked ? 1 : 0)` puts unchecked first.
+- [ ] Access `/dashboard` without login → redirects to `/login`
+- [ ] Login with invalid credentials → shows error
+- [ ] Login with valid credentials → redirects to `/dashboard`
+- [ ] Access `/login` while authenticated → redirects to `/dashboard`
+- [ ] Register new user → auto-logs in and redirects to `/dashboard`
+- [ ] Logout → clears session and redirects to `/login`
+- [ ] Refresh page while logged in → maintains auth state
 
-### Debugging localStorage
+**Todo Functionality:**
 
-Open DevTools → Application → Local Storage → `http://localhost:5173` → key `list-items` to inspect/edit JSON directly.
+- [ ] New user sees default todo list
+- [ ] Check/uncheck todo → updates UI and persists
+- [ ] Checked todos move to bottom (sorting)
+- [ ] Dashboard stats reflect current user's todos
+- [ ] Create second user → sees separate todo list
+- [ ] Switch between users → todos remain isolated
+
+**Router Behavior:**
+
+- [ ] Direct URL access respects auth guards
+- [ ] Browser back/forward works correctly
+- [ ] Root `/` redirects based on auth status
+
+## Common Patterns
+
+### Adding a New Protected Route
+
+1. Create view component in `src/views/`
+2. Add route to `src/router/index.ts`:
+
+```typescript
+{
+  path: '/new-route',
+  component: NewView,
+  meta: { requiresAuth: true }
+}
+```
+
+### Adding a New Component
+
+1. Create component file with `<script setup lang="ts">`
+2. Import types from `@/types`
+3. Use composables like `useAuth()` for shared state
+4. Add scoped styles for component-specific CSS
+
+### Accessing Current User
+
+```typescript
+import { useAuth } from '@/composables/useAuth'
+
+const { currentUser, isAuthenticated } = useAuth()
+
+// currentUser.value.id, currentUser.value.name, etc.
+```
+
+### User-Scoped Storage
+
+```typescript
+const userId = currentUser.value?.id
+const storageKey = `list-items-${userId}`
+localStorage.setItem(storageKey, JSON.stringify(data))
+```
+
+## Deployment
+
+The app deploys to GitHub Pages at: `https://adityapryg.github.io/bm-vue-todo-app/`
+
+**Deploy command:** `npm run deploy`
+
+This builds the app with base path `/bm-vue-todo-app/` and pushes to `gh-pages` branch.
+
+## Future Enhancements
+
+- Backend API integration with proper authentication
+- Password strength validation
+- Email verification
+- Forgot password flow
+- Add/edit/delete todo functionality
+- Todo categories or tags
+- Dark mode toggle
+- Mobile responsive improvements
+- Unit and E2E tests

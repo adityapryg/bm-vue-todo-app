@@ -1,18 +1,17 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @layer base {
   * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  }
-
-  body {
-    background: #f3f4f6;
+    @apply m-0 p-0 box-border;
+    font-family:
+      'Poppins',
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      sans-serif;
   }
 
   ul {
-    list-style: none;
+    @apply list-none;
   }
 }
