@@ -4,7 +4,12 @@
 
     <ul>
       <li v-for="(item, index) in sortedList" :key="item.title + index">
-        <TaskItem :isChecked="item.checked" @update="updateItem(item)" @edit="startEdit(item)">
+        <TaskItem
+          :isChecked="item.checked"
+          @update="updateItem(item)"
+          @edit="startEdit(item)"
+          @delete="confirmDelete(item)"
+        >
           {{ item.title }}
         </TaskItem>
       </li>
@@ -15,12 +20,19 @@
       @updateTodo="editTodo"
       @cancel="cancelEdit"
     />
+    <ConfirmModal
+      :isOpen="showDeleteModal"
+      :itemTitle="deletingItem?.title || ''"
+      @confirm="deleteTodo"
+      @cancel="cancelDelete"
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
 import TaskItem from './TaskItem.vue'
 import TodoEditForm from './TodoEditForm.vue'
+import ConfirmModal from './ConfirmModal.vue'
 import { ref, computed, onMounted, type Ref } from 'vue'
 import TodoForm from './TodoForm.vue'
 import type { Item } from '@/types'
@@ -32,6 +44,8 @@ const props = defineProps<{
 const storageItems: Ref<Item[]> = ref([])
 const isEditing = ref(false)
 const editingItem = ref<Item | null>(null)
+const showDeleteModal = ref(false)
+const deletingItem = ref<Item | null>(null)
 
 const getStorageKey = (): string => {
   return `list-items-${props.userId}`
@@ -112,6 +126,28 @@ const editTodo = (newTitle: string): void => {
 const cancelEdit = (): void => {
   isEditing.value = false
   editingItem.value = null
+}
+
+const confirmDelete = (item: Item): void => {
+  deletingItem.value = item
+  showDeleteModal.value = true
+}
+
+const deleteTodo = (): void => {
+  if (deletingItem.value) {
+    const index = storageItems.value.findIndex((item) => item.title === deletingItem.value!.title)
+    if (index !== -1) {
+      storageItems.value.splice(index, 1)
+      setToStorage(storageItems.value)
+    }
+  }
+  showDeleteModal.value = false
+  deletingItem.value = null
+}
+
+const cancelDelete = (): void => {
+  showDeleteModal.value = false
+  deletingItem.value = null
 }
 
 const sortedList = computed(() =>

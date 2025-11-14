@@ -18,24 +18,34 @@
     >
       <slot></slot>
     </span>
-    <Transition
-      enter-active-class="transition-all duration-300 ease-out"
-      leave-active-class="transition-all duration-200 ease-in"
-      enter-from-class="opacity-0 scale-95"
-      enter-to-class="opacity-100 scale-100"
-      leave-from-class="opacity-100 scale-100"
-      leave-to-class="opacity-0 scale-95"
-    >
-      <button
-        v-if="!isChecked"
-        @click.prevent="emit('edit')"
-        type="button"
-        class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-[#667eea] bg-[#667eea]/10 rounded-lg hover:bg-[#667eea] hover:text-white hover:shadow-sm"
+    <div class="flex gap-2">
+      <Transition
+        enter-active-class="transition-all duration-300 ease-out"
+        leave-active-class="transition-all duration-200 ease-in"
+        enter-from-class="opacity-0 scale-95"
+        enter-to-class="opacity-100 scale-100"
+        leave-from-class="opacity-100 scale-100"
+        leave-to-class="opacity-0 scale-95"
       >
-        <span>✏️</span>
-        <span>Edit</span>
+        <button
+          v-if="!isChecked"
+          @click.prevent="emit('edit')"
+          type="button"
+          class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-[#667eea] bg-[#667eea]/10 rounded-lg hover:bg-[#667eea] hover:text-white hover:shadow-sm transition-all duration-200"
+        >
+          <span>✏️</span>
+          <span>Edit</span>
+        </button>
+      </Transition>
+      <button
+        @click.prevent="emit('delete')"
+        type="button"
+        class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-500 bg-red-50 rounded-lg hover:bg-red-500 hover:text-white hover:shadow-sm transition-all duration-200"
+      >
+        <span>🗑️</span>
+        <span>Delete</span>
       </button>
-    </Transition>
+    </div>
   </label>
 </template>
 
@@ -44,5 +54,5 @@ defineProps<{
   isChecked?: boolean | false
 }>()
 
-const emit = defineEmits(['update', 'edit'])
+const emit = defineEmits(['update', 'edit', 'delete'])
 </script>
