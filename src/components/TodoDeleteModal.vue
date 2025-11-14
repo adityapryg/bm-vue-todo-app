@@ -23,9 +23,9 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted } from 'vue'
+import { watch } from 'vue'
 
-defineProps<{
+const props = defineProps<{
   isOpen: boolean
   todoTitle: string
 }>()
@@ -45,13 +45,17 @@ const handleEscKey = (e: KeyboardEvent) => {
   }
 }
 
-onMounted(() => {
-  document.addEventListener('keydown', handleEscKey)
-})
-
-onUnmounted(() => {
-  document.removeEventListener('keydown', handleEscKey)
-})
+// Add/remove ESC key listener based on modal open state
+watch(
+  () => props.isOpen,
+  (isOpen) => {
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscKey)
+    } else {
+      document.removeEventListener('keydown', handleEscKey)
+    }
+  },
+)
 </script>
 
 <style scoped>

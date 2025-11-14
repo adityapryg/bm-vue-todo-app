@@ -1,7 +1,7 @@
 <template>
   <div class="todo-container">
     <ul class="todo-list">
-      <li v-for="(item, index) in sortedList" :key="item.title + index">
+      <li v-for="item in sortedList" :key="item.id">
         <ListItem :isChecked="item.checked" @update="updateItem(item)" @delete="startDelete(item)">
           {{ item.title }}
         </ListItem>
@@ -22,6 +22,7 @@ import TodoDeleteModal from './TodoDeleteModal.vue'
 import { ref, computed, onMounted, type Ref } from 'vue'
 
 type Item = {
+  id: string
   title: string
   checked?: boolean
 }
@@ -42,18 +43,22 @@ const getFromStorage = (): Item[] | [] => {
   return []
 }
 
+const generateId = (): string => {
+  return Date.now().toString(36) + Math.random().toString(36).substring(2)
+}
+
 const initListItems = (): void => {
   if (storageItems.value?.length === 0) {
     const listItems: Item[] = [
-      { title: 'Make a todo list app', checked: true },
-      { title: 'Predict the weather', checked: false },
-      { title: 'Read some comics', checked: false },
-      { title: "Let's get cooking", checked: false },
-      { title: 'Pump some iron', checked: false },
-      { title: 'Track my expenses', checked: false },
-      { title: 'Organise a game night', checked: false },
-      { title: 'Learn a new language', checked: false },
-      { title: 'Publish my work', checked: false },
+      { id: generateId(), title: 'Make a todo list app', checked: true },
+      { id: generateId(), title: 'Predict the weather', checked: false },
+      { id: generateId(), title: 'Read some comics', checked: false },
+      { id: generateId(), title: "Let's get cooking", checked: false },
+      { id: generateId(), title: 'Pump some iron', checked: false },
+      { id: generateId(), title: 'Track my expenses', checked: false },
+      { id: generateId(), title: 'Organise a game night', checked: false },
+      { id: generateId(), title: 'Learn a new language', checked: false },
+      { id: generateId(), title: 'Publish my work', checked: false },
     ]
     setToStorage(listItems)
     storageItems.value = listItems
@@ -69,7 +74,7 @@ const updateItem = (item: Item): void => {
 }
 
 const findItemInList = (item: Item): Item | undefined => {
-  return storageItems.value.find((itemInList: Item) => itemInList.title === item.title)
+  return storageItems.value.find((itemInList: Item) => itemInList.id === item.id)
 }
 
 const toggleItemChecked = (item: Item): void => {
@@ -78,6 +83,7 @@ const toggleItemChecked = (item: Item): void => {
 
 const addNewTodo = (title: string): void => {
   const newItem: Item = {
+    id: generateId(),
     title,
     checked: false
   }
@@ -97,7 +103,7 @@ const startDelete = (item: Item): void => {
 const confirmDelete = (): void => {
   if (deletingItem.value) {
     const index = storageItems.value.findIndex(
-      (item) => item.title === deletingItem.value!.title,
+      (item) => item.id === deletingItem.value!.id,
     )
     if (index !== -1) {
       storageItems.value.splice(index, 1)

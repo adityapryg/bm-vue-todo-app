@@ -139,6 +139,13 @@ label:hover .delete-btn {
   transform: scale(0.95);
 }
 
+.delete-btn:focus,
+.delete-btn:focus-visible {
+  opacity: 1;
+  outline: 2px solid #ef4444;
+  outline-offset: 2px;
+}
+
 @media (max-width: 768px) {
   .delete-btn {
     opacity: 1;
