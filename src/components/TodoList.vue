@@ -1,21 +1,28 @@
 <template>
-  <div class="max-w-[600px] my-8 mx-auto px-4">
-    <ul
-      class="bg-white/80 backdrop-blur-[10px] rounded-2xl p-6 shadow-[0_8px_32px_rgba(0,0,0,0.1)]"
-    >
+  <div class="bg-white/80 backdrop-blur-[10px] rounded-2xl p-6 max-w-[600px] mx-auto px-4">
+    <TodoForm @addTodo="addNewTodo" />
+
+    <ul>
       <li v-for="(item, index) in sortedList" :key="item.title + index">
-        <TaskItem :isChecked="item.checked" @update="updateItem(item)">
+        <TaskItem :isChecked="item.checked" @update="updateItem(item)" @edit="startEdit(item)">
           {{ item.title }}
         </TaskItem>
       </li>
     </ul>
+    <TodoEditForm
+      :isEditing="isEditing"
+      :currentText="editingItem?.title || ''"
+      @updateTodo="editTodo"
+      @cancel="cancelEdit"
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
 import TaskItem from './TaskItem.vue'
-import { ref, computed, onMounted } from 'vue'
-import type { Ref } from 'vue'
+import TodoEditForm from './TodoEditForm.vue'
+import { ref, computed, onMounted, type Ref } from 'vue'
+import TodoForm from './TodoForm.vue'
 
 type Item = {
   title: string
@@ -23,6 +30,8 @@ type Item = {
 }
 
 const storageItems: Ref<Item[]> = ref([])
+const isEditing = ref(false)
+const editingItem = ref<Item | null>(null)
 
 const setToStorage = (items: Item[]): void => {
   localStorage.setItem('list-items', JSON.stringify(items))
@@ -68,6 +77,37 @@ const findItemInList = (item: Item): Item | undefined => {
 
 const toggleItemChecked = (item: Item): void => {
   item.checked = !item.checked
+}
+
+const addNewTodo = (title: string): void => {
+  const newItem: Item = {
+    title,
+    checked: false,
+  }
+  storageItems.value.unshift(newItem)
+  setToStorage(storageItems.value)
+}
+
+const startEdit = (item: Item): void => {
+  editingItem.value = item
+  isEditing.value = true
+}
+
+const editTodo = (newTitle: string): void => {
+  if (editingItem.value && newTitle.trim() && newTitle !== editingItem.value.title) {
+    const item = findItemInList(editingItem.value)
+    if (item) {
+      item.title = newTitle.trim()
+      setToStorage(storageItems.value)
+    }
+  }
+  isEditing.value = false
+  editingItem.value = null
+}
+
+const cancelEdit = (): void => {
+  isEditing.value = false
+  editingItem.value = null
 }
 
 const sortedList = computed(() =>

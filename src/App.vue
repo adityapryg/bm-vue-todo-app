@@ -4,8 +4,10 @@ import TodoList from './components/TodoList.vue'
 </script>
 
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-[#667eea] to-[#764ba2] p-8 antialiased text-center text-[#2c3e50] text-xl">
+  <div
+    class="min-h-screen bg-gradient-to-br from-[#667eea] to-[#764ba2] p-8 antialiased text-center text-[#2c3e50] text-xl"
+  >
     <AppHeader />
-    <TodoList />
+    <TodoList ref="todoListRef" />
   </div>
 </template>
