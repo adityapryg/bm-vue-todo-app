@@ -1,7 +1,10 @@
 <template>
-  <div class="tasks-view">
-    <div class="back-nav">
-      <router-link to="/dashboard" class="back-btn">
+  <div class="min-h-screen">
+    <div class="p-4 px-8 max-w-[600px] mx-auto">
+      <router-link
+        to="/dashboard"
+        class="inline-block text-white no-underline font-medium py-2 px-4 bg-white/10 backdrop-blur-[10px] rounded-lg transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:bg-white/20 hover:-translate-x-1"
+      >
         ← Back to Dashboard
       </router-link>
     </div>
@@ -24,32 +27,3 @@ const handleLogout = () => {
   router.push('/login')
 }
 </script>
-
-<style scoped>
-.tasks-view {
-  min-height: 100vh;
-}
-
-.back-nav {
-  padding: 1rem 2rem;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.back-btn {
-  display: inline-block;
-  color: white;
-  text-decoration: none;
-  font-weight: 500;
-  padding: 0.5rem 1rem;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 8px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.back-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateX(-4px);
-}
-</style>

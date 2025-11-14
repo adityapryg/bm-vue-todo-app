@@ -3,7 +3,7 @@
     <div class="auth-card">
       <LoginForm />
       <p class="switch-link">
-        Don't have an account? 
+        Don't have an account?
         <router-link to="/register">Sign up</router-link>
       </p>
     </div>

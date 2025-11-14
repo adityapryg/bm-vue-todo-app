@@ -2,7 +2,7 @@
   <form @submit.prevent="handleSubmit" class="auth-form">
     <h2>Create Account</h2>
     <div v-if="error" class="error-message">{{ error }}</div>
-    
+
     <div class="form-group">
       <label for="name">Name</label>
       <input
@@ -94,12 +94,8 @@ const handleSubmit = async () => {
   loading.value = true
 
   try {
-    const result = register(
-      formData.value.email,
-      formData.value.password,
-      formData.value.name,
-    )
-    
+    const result = register(formData.value.email, formData.value.password, formData.value.name)
+
     if (result.success) {
       await router.push('/dashboard')
     } else {

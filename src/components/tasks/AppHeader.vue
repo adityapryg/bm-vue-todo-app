@@ -5,9 +5,7 @@
         <h1>✨ Todo List</h1>
         <p class="greeting">Welcome, {{ userName }}</p>
       </div>
-      <button @click="emit('logout')" class="logout-btn">
-        Logout
-      </button>
+      <button @click="emit('logout')" class="logout-btn">Logout</button>
     </div>
   </header>
 </template>

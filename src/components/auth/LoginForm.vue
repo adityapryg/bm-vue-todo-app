@@ -2,7 +2,7 @@
   <form @submit.prevent="handleSubmit" class="auth-form">
     <h2>Welcome Back</h2>
     <div v-if="error" class="error-message">{{ error }}</div>
-    
+
     <div class="form-group">
       <label for="email">Email</label>
       <input
@@ -55,7 +55,7 @@ const handleSubmit = async () => {
 
   try {
     const result = login(formData.value.email, formData.value.password)
-    
+
     if (result.success) {
       await router.push('/dashboard')
     } else {
