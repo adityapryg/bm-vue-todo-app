@@ -1,19 +1,28 @@
 <template>
-  <div class="todo-container">
-    <ul class="todo-list">
+  <div class="bg-white/80 backdrop-blur-[10px] rounded-2xl p-6 max-w-[600px] mx-auto px-4">
+    <TodoForm @addTodo="addNewTodo" />
+
+    <ul>
       <li v-for="(item, index) in sortedList" :key="item.title + index">
-        <ListItem :isChecked="item.checked" @update="updateItem(item)">
+        <TaskItem :isChecked="item.checked" @update="updateItem(item)" @edit="startEdit(item)">
           {{ item.title }}
-        </ListItem>
+        </TaskItem>
       </li>
     </ul>
+    <TodoEditForm
+      :isEditing="isEditing"
+      :currentText="editingItem?.title || ''"
+      @updateTodo="editTodo"
+      @cancel="cancelEdit"
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
-import ListItem from './ListItem.vue'
-import { ref, computed, onMounted } from 'vue'
-import type { Ref } from 'vue'
+import TaskItem from './TaskItem.vue'
+import TodoEditForm from './TodoEditForm.vue'
+import { ref, computed, onMounted, type Ref } from 'vue'
+import TodoForm from './TodoForm.vue'
 import type { Item } from '@/types'
 
 const props = defineProps<{
@@ -21,6 +30,8 @@ const props = defineProps<{
 }>()
 
 const storageItems: Ref<Item[]> = ref([])
+const isEditing = ref(false)
+const editingItem = ref<Item | null>(null)
 
 const getStorageKey = (): string => {
   return `list-items-${props.userId}`
@@ -72,6 +83,37 @@ const toggleItemChecked = (item: Item): void => {
   item.checked = !item.checked
 }
 
+const addNewTodo = (title: string): void => {
+  const newItem: Item = {
+    title,
+    checked: false,
+  }
+  storageItems.value.unshift(newItem)
+  setToStorage(storageItems.value)
+}
+
+const startEdit = (item: Item): void => {
+  editingItem.value = item
+  isEditing.value = true
+}
+
+const editTodo = (newTitle: string): void => {
+  if (editingItem.value && newTitle.trim() && newTitle !== editingItem.value.title) {
+    const item = findItemInList(editingItem.value)
+    if (item) {
+      item.title = newTitle.trim()
+      setToStorage(storageItems.value)
+    }
+  }
+  isEditing.value = false
+  editingItem.value = null
+}
+
+const cancelEdit = (): void => {
+  isEditing.value = false
+  editingItem.value = null
+}
+
 const sortedList = computed(() =>
   [...storageItems.value].sort((a, b) => (a.checked ? 1 : 0) - (b.checked ? 1 : 0)),
 )
@@ -81,19 +123,3 @@ onMounted(() => {
   initListItems()
 })
 </script>
-
-<style scoped>
-.todo-container {
-  max-width: 600px;
-  margin: 2rem auto;
-  padding: 0 1rem;
-}
-
-.todo-list {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
-</style>
